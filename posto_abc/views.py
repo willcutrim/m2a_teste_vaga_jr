@@ -18,6 +18,7 @@ from django.shortcuts import get_object_or_404
 
 
 class CriarAbastecimentoView(CreateView):
+
     model = Abastecimento
     form_class = AbastecimentoForm
     template_name = 'html/criar_abastecimento.html'
@@ -26,6 +27,7 @@ class CriarAbastecimentoView(CreateView):
 
 
 class RelatorioAbastecimentosView(TemplateView):
+
     template_name = 'html/relatorio_abastecimentos.html'
 
     def get_context_data(self, **kwargs):
@@ -38,8 +40,8 @@ class RelatorioAbastecimentosView(TemplateView):
         
         context.update({
             'relatorio': relatorio,
-            'total_valor': total_valor,
-            'total_imposto': total_imposto,
+            'total_valor': round(total_valor, 2),
+            'total_imposto': round(total_imposto, 2),
             'data_inicio': data_inicio,
             'data_fim': data_fim,
         })
@@ -53,6 +55,7 @@ class RelatorioAbastecimentosView(TemplateView):
 
 
 class AbastecimentosBombaView(DetailView):
+
     model = Bomba
     template_name = 'html/abastecimentos.html'
     context_object_name = 'bomba'
@@ -69,12 +72,6 @@ class AbastecimentosBombaView(DetailView):
             'data': data_formatada,
         })
         return context
-
-
-
-class HomeView(TemplateView):
-    template_name = 'html/home.html'
-
 
 
 
@@ -103,9 +100,9 @@ def gerar_pdf_abastecimentos(request, bomba_id, data):
 
     for abastecimento in abastecimentos:
         p.drawString(50, y, f"Data: {abastecimento.data_formatada()}")
-        p.drawString(200, y, f"Litros: {abastecimento.litros}")
-        p.drawString(300, y, f"Valor: R${abastecimento.valor}")
-        p.drawString(400, y, f"Imposto: R${abastecimento.imposto}")
+        p.drawString(170, y, f"Tanque: {abastecimento.bomba.tanque.tipo_combustivel}")
+        p.drawString(290, y, f"Bomba: {abastecimento.bomba.identificacao}")
+        p.drawString(400, y, f"Valor: R$ {abastecimento.valor}")
         y -= 20
 
         total_litros += abastecimento.litros
@@ -116,7 +113,7 @@ def gerar_pdf_abastecimentos(request, bomba_id, data):
 
     y = 50
     p.drawString(400, y, f"Total de Imposto: R${total_imposto}")
-    p.drawString(200, y, f"Valor total: R${total_valor}")
+    p.drawString(250, y, f"Valor total: R${total_valor}")
     p.drawString(50, y, f"Total de Litros: {total_litros}")
 
     p.save()

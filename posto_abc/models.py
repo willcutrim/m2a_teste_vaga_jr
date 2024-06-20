@@ -66,6 +66,7 @@ class Abastecimento(models.Model):
     def data_formatada(self):
         return self.data.strftime('%d/%m/%Y %H:%M')
 
+
     
 
     def __str__(self):
