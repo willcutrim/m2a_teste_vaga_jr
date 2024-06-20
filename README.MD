@@ -1,6 +1,6 @@
-# Nome do Projeto
+# Sistema Posto ABC
 
-Descrição breve do seu projeto.
+Projeto criado para um teste com intuito de mostrar minhas habilidades em com Python e Django.
 
 ## Requisitos
 
