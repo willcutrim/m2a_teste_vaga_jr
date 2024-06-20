@@ -1,13 +1,18 @@
 {% extends "base.html" %}
+{% load bootstrap %}
 {% block title %}Criar Abastecimento{% endblock title %}
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4">Criar Abastecimento</h1>
-    <form method="POST" action="">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Salvar</button>
-    </form>
+    <h1 class="alert alert mt-2 d-flex justify-content-center bg-primary text-light">Criar Abastecimento</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="">
+                {% csrf_token %}
+                {{ form|bootstrap }}
+                <button type="submit" class="btn btn-primary mt-2">Salvar</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock content %}

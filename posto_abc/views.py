@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from django.db.models import Sum
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, DetailView
-from .models import Abastecimento, Bomba
-from .forms import AbastecimentoForm
+from .models import Abastecimento, Bomba, Tanque, PrecoCombustivel, Posto
+from .forms import AbastecimentoForm, PostoForm, PrecoCombustivelForm, BombaForm, TanqueForm
 from .utils import gerar_relatorio
 from django.http import HttpResponse
 
@@ -25,6 +25,34 @@ class CriarAbastecimentoView(CreateView):
     success_url = reverse_lazy('relatorio_abastecimentos')
 
 
+class CriarBombaView(CreateView):
+
+    model = Bomba
+    form_class = BombaForm
+    template_name = 'html/criar_bomba.html'
+    success_url = reverse_lazy('criar_bomba')
+
+class CriarTanqueView(CreateView):
+
+    model = Tanque
+    form_class = TanqueForm
+    template_name = 'html/criar_tanque.html'
+    success_url = reverse_lazy('criar_tanque')
+
+class CriarPostoView(CreateView):
+
+    model = Posto
+    form_class = PostoForm
+    template_name = 'html/criar_posto.html'
+    success_url = reverse_lazy('criar_posto')
+
+
+class CriarPrecoCombustivelView(CreateView):
+
+    model = PrecoCombustivel
+    form_class = PrecoCombustivelForm
+    template_name = 'html/criar_preco_combustivel.html'
+    success_url = reverse_lazy('criar_preco_combustivel')
 
 class RelatorioAbastecimentosView(TemplateView):
 
@@ -40,8 +68,8 @@ class RelatorioAbastecimentosView(TemplateView):
         
         context.update({
             'relatorio': relatorio,
-            'total_valor': round(total_valor, 2),
-            'total_imposto': round(total_imposto, 2),
+            'total_valor': total_valor,
+            'total_imposto': total_imposto,
             'data_inicio': data_inicio,
             'data_fim': data_fim,
         })
@@ -102,7 +130,7 @@ def gerar_pdf_abastecimentos(request, bomba_id, data):
         p.drawString(50, y, f"Data: {abastecimento.data_formatada()}")
         p.drawString(170, y, f"Tanque: {abastecimento.bomba.tanque.tipo_combustivel}")
         p.drawString(290, y, f"Bomba: {abastecimento.bomba.identificacao}")
-        p.drawString(400, y, f"Valor: R$ {abastecimento.valor}")
+        p.drawString(450, y, f"Valor: R$ {abastecimento.valor}")
         y -= 20
 
         total_litros += abastecimento.litros

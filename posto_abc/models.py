@@ -19,12 +19,19 @@ class Tanque(models.Model):
     nivel_atual = models.FloatField()
     posto = models.ForeignKey(Posto, related_name='tanques', on_delete=models.CASCADE)
 
+    def criar_nivel_atual(self):
+        self.nivel_atual = self.capacidade
+    
+    def save(self, *args, **kwargs):
+        self.criar_nivel_atual()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.get_tipo_combustivel_display()} - Capacidade: {self.capacidade}L - Posto: {self.posto.nome}'
 
 
 class Bomba(models.Model):
-    identificacao = models.CharField(max_length=10)
+    identificacao = models.CharField(max_length=250)
     tanque = models.ForeignKey(Tanque, related_name='bombas', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -65,9 +72,6 @@ class Abastecimento(models.Model):
 
     def data_formatada(self):
         return self.data.strftime('%d/%m/%Y %H:%M')
-
-
-    
 
     def __str__(self):
         return f'Abastecimento {self.id} - Bomba - {self.bomba.identificacao} - Posto: {self.bomba.tanque.posto.nome}'

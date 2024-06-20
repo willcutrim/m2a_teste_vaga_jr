@@ -4,7 +4,21 @@
 {% block content %}
 <div class="container">
     <h1 class="alert alert mt-2 d-flex justify-content-center bg-primary text-light">Relatório de Abastecimentos</h1>
-    <div class="col-12 d-flex justify-content-end mb-2">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+        <div class="col-8 d-flex align-items-center align-self-end">
+            <a href="{% url 'criar_bomba' %}" style="margin-right: 10px;">
+                <button type="button" class="btn btn-primary">Cadastrar Bomba</button>
+            </a>
+            <a href="{% url 'criar_posto' %}" style="margin-right: 10px;">
+                <button type="button" class="btn btn-primary">Cadastrar Posto</button>
+            </a>
+            <a href="{% url 'criar_tanque' %}">
+                <button type="button" class="btn btn-primary" style="margin-right: 10px;">Cadastrar Tanque</button>
+            </a>
+            <a href="{% url 'criar_preco_combustivel' %}">
+                <button type="button" class="btn btn-primary">Preço do Combustível</button>
+            </a>
+        </div>
         <form method="GET" action="">
             <div class="row">
                 <div class="form-group col-md-2 align-self-end">
@@ -21,45 +35,44 @@
             </div>
         </form>
     </div>
-    <div class="card-body">
-        <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Posto</th>
+                <th scope="col">Tanque</th>
+                <th scope="col">Bomba</th>
+                <th scope="col">Total de Litros</th>
+                <th scope="col">Total Valor</th>
+                <th scope="col">Total Imposto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in relatorio %}
                 <tr>
-                    <th>Data</th>
-                    <th>Posto</th>
-                    <th>Tanque</th>
-                    <th>Bomba</th>
-                    <th>Total de Litros</th>
-                    <th>Total Valor</th>
-                    <th>Total Imposto</th>
+                    <td>{{ item.data__date }}</td>
+                    <td>{{ item.bomba__tanque__posto__nome }}</td>
+                    <td>{{ item.bomba__tanque__tipo_combustivel }}</td>
+                    <td><a href="{% url 'abastecimentos_bomba' item.bomba_id item.data__date %}">{{ item.bomba__identificacao }}</a></td>
+                    <td>{{ item.total_litros }}</td>
+                    <td>{{ item.total_valor|floatformat:2|default:"0,00" }}</td>
+                    <td>{{ item.total_imposto|floatformat:2|default:"0,00" }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for item in relatorio %}
-                    <tr>
-                        <td>{{ item.data__date }}</td>
-                        <td>{{ item.bomba__tanque__posto__nome }}</td>
-                        <td>{{ item.bomba__tanque__tipo_combustivel }}</td>
-                        <td><a href="{% url 'abastecimentos_bomba' item.bomba_id item.data__date %}">{{ item.bomba__identificacao }}</a></td>
-                        <td>{{ item.total_litros }}</td>
-                        <td>{{ item.total_valor|floatformat:2 }}</td>
-                        <td>{{ item.total_imposto|floatformat:2 }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">Não há dados de abastecimentos para o período selecionado.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Não há dados de abastecimentos para o período selecionado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
     <div class="d-flex justify-content-between  ">
         <a href="{% url 'criar_abastecimento' %}">
             <button type="button" class="btn btn-primary">Criar abastecimento</button>
         </a>
         <div class="text-end">
-        <strong>Valor Total: </strong> R${{ total_valor }}<br>
-        <strong>Total Imposto: </strong> R${{ total_imposto }}
+            <strong>Valor Total: </strong> R${{ total_valor|floatformat:2|default:"0,00" }}<br>
+            <strong>Total Imposto: </strong> R${{ total_imposto|floatformat:2|default:"0,00" }}
         </div>
     </div>
 </div>
