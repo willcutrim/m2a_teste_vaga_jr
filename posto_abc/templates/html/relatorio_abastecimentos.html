@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Relatório de Abastecimentos{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Relatório de Abastecimentos</h1>
+    <a href="{% url 'criar_abastecimento' %}">
+        <button type="button" class="btn btn-primary">Cadastrar Abastecimento</button>
+    </a>
+    <form method="GET" action="">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="data_inicio">Data Inicial</label>
+                <input type="date" class="form-control" id="data_inicio" name="data_inicio">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="data_fim">Data Final</label>
+                <input type="date" class="form-control" id="data_fim" name="data_fim">
+            </div>
+            <div class="form-group col-md-4 align-self-end">
+                <button type="submit" class="btn btn-primary mt-4">Filtrar</button>
+            </div>
+        </div>
+    </form>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Data</th>
+                <th>Posto</th>
+                <th>Tanque</th>
+                <th>Bomba</th>
+                <th>Total de Litros</th>
+                <th>Total Valor</th>
+                <th>Total Imposto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in relatorio %}
+                <tr>
+                    <td>{{ item.data__date }}</td>
+                    <td>{{ item.bomba__tanque__posto__nome }}</td>
+                    <td>{{ item.bomba__tanque__tipo_combustivel }}</td>
+                    <td><a href="{% url 'abastecimentos_bomba' item.bomba_id item.data__date %}">{{ item.bomba__identificacao }}</a></td>
+                    <td>{{ item.total_litros }}</td>
+                    <td>{{ item.total_valor }}</td>
+                    <td>{{ item.total_imposto }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Não há dados de abastecimentos para o período selecionado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="mt-4">
+        <strong>Valor Total: </strong> R${{ total_valor }}<br>
+        <strong>Total Imposto: </strong> R${{ total_imposto }}
+    </div>
+</div>
+{% endblock content %}

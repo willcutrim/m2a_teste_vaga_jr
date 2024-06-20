@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Abastecimentos da Bomba{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Abastecimentos da {{ bomba.identificacao }} em {{ data }}</h1>
+    <a href="{% url 'gerar_pdf_abastecimentos' bomba.id data %}" class="btn btn-primary mb-3">Gerar PDF</a>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Data</th>
+                <th>Litros</th>
+                <th>Valor</th>
+                <th>Imposto</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for abastecimento in abastecimentos %}
+                <tr>
+                    <td>{{ abastecimento.data }}</td>
+                    <td>{{ abastecimento.litros }}</td>
+                    <td>R${{ abastecimento.valor }}</td>
+                    <td>R${{ abastecimento.imposto }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Não há abastecimentos registrados para esta bomba nesta data.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
