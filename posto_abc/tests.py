@@ -32,7 +32,6 @@ class TestModels(TestCase):
         self.assertEqual(self.preco_combustivel.preco_por_litro, 5.00)
 
     def test_criar_nivel_atual(self):
-        self.tanque.criar_nivel_atual()
         self.assertEqual(self.tanque.nivel_atual, 1000)
 
     def test_str(self):
@@ -40,3 +39,5 @@ class TestModels(TestCase):
         self.assertEqual(str(self.tanque), 'Gasolina - Capacidade: 1000L - Posto: Posto ABC')
 
 
+    def test_abastecimento(self):
+        self.assertEqual(self.abastecimento.litros, 100)

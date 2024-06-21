@@ -1,5 +1,6 @@
 import io
 from PyPDF2 import PdfWriter, PdfReader
+from django.forms import BaseModelForm
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
@@ -11,8 +12,9 @@ from .models import Abastecimento, Bomba, Tanque, PrecoCombustivel, Posto
 from .forms import AbastecimentoForm, PostoForm, PrecoCombustivelForm, BombaForm, TanqueForm
 from .utils import gerar_relatorio
 from django.http import HttpResponse
+from django.contrib import messages
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
 
 
@@ -23,6 +25,31 @@ class CriarAbastecimentoView(CreateView):
     form_class = AbastecimentoForm
     template_name = 'html/criar_abastecimento.html'
     success_url = reverse_lazy('relatorio_abastecimentos')
+
+    def form_valid(self, form):
+        bomba = form.cleaned_data['bomba']
+        litros = form.cleaned_data['litros']
+        tipo_combustivel = bomba.tanque.tipo_combustivel
+        
+        try:
+            preco_combustivel = PrecoCombustivel.objects.filter(tipo_combustivel=tipo_combustivel).latest('data_atualizacao')
+        except PrecoCombustivel.DoesNotExist:
+            messages.add_message(self.request, messages.ERROR, f'Não há preço cadastrado para o combustível {tipo_combustivel}. Por favor, cadastre o preço primeiro.')
+            form.add_error(None, f'Não há preço cadastrado para o combustível {tipo_combustivel}. Por favor, cadastre o preço primeiro.')
+            return self.form_invalid(form)
+
+        capacidade_tanque = bomba.tanque.capacidade
+        nivel_atual = bomba.tanque.nivel_atual
+        if litros > nivel_atual:
+
+            form.add_error('litros', f'O abastecimento ultrapassa a capacidade máxima do tanque ({capacidade_tanque} litros. Nível atual: {nivel_atual} litros).')
+            return self.render_to_response(self.get_context_data(form=form))
+    
+        tanque = Tanque.objects.filter(id=bomba.tanque.id).first()
+        tanque.nivel_atual -= litros
+        tanque.save()
+        
+        return super().form_valid(form)
 
 
 class CriarBombaView(CreateView):
