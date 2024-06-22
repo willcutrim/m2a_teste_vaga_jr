@@ -59,12 +59,22 @@ class CriarBombaView(CreateView):
     template_name = 'html/criar_bomba.html'
     success_url = reverse_lazy('criar_bomba')
 
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Bomba criada com sucesso.')
+        return super().form_valid(form)
+
 class CriarTanqueView(CreateView):
 
     model = Tanque
     form_class = TanqueForm
     template_name = 'html/criar_tanque.html'
     success_url = reverse_lazy('criar_tanque')
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Tanque criado com sucesso.')
+        return super().form_valid(form)
 
 class CriarPostoView(CreateView):
 
@@ -73,6 +83,10 @@ class CriarPostoView(CreateView):
     template_name = 'html/criar_posto.html'
     success_url = reverse_lazy('criar_posto')
 
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Posto criado com sucesso.')
+        return super().form_valid(form)
 
 class CriarPrecoCombustivelView(CreateView):
 
@@ -80,6 +94,11 @@ class CriarPrecoCombustivelView(CreateView):
     form_class = PrecoCombustivelForm
     template_name = 'html/criar_preco_combustivel.html'
     success_url = reverse_lazy('criar_preco_combustivel')
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Preço de combustível criado com sucesso.')
+        return super().form_valid(form)
 
 class RelatorioAbastecimentosView(TemplateView):
 
@@ -89,10 +108,16 @@ class RelatorioAbastecimentosView(TemplateView):
         context = super().get_context_data(**kwargs)
         data_inicio = self.request.GET.get('data_inicio', (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d'))
         data_fim = self.request.GET.get('data_fim', datetime.now().strftime('%Y-%m-%d'))
-        
         relatorio = gerar_relatorio(data_inicio, data_fim)
-        total_valor, total_imposto = self.calcular_totais(relatorio)
-        
+
+        total_valor = 0
+        total_imposto = 0
+
+
+        for relatorio_item in relatorio:
+            total_valor += relatorio_item['total_valor']
+            total_imposto += relatorio_item['total_imposto']
+
         context.update({
             'relatorio': relatorio,
             'total_valor': total_valor,
@@ -101,11 +126,6 @@ class RelatorioAbastecimentosView(TemplateView):
             'data_fim': data_fim,
         })
         return context
-
-    def calcular_totais(self, relatorio):
-        total_valor = relatorio.aggregate(total_valor=Sum('total_valor'))['total_valor']
-        total_imposto = relatorio.aggregate(total_imposto=Sum('total_imposto'))['total_imposto']
-        return total_valor, total_imposto
 
 
 

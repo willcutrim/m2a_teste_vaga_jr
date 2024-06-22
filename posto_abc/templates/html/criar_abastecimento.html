@@ -18,6 +18,7 @@
                 {% csrf_token %}
                 {{ form|bootstrap }}
                 <button type="submit" class="btn btn-primary mt-2">Salvar</button>
+                <a href="{% url 'relatorio_abastecimentos' %}" class="btn btn-light mt-2">Voltar</a>
             </form>
         </div>
     </div>
