@@ -5,6 +5,15 @@
 {% block content %}
 <div class="container">
     <h1 class="alert alert mt-2 d-flex justify-content-center bg-primary text-light">Criar Posto</h1>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li class="{% if message.tags %}{{message.tags}}{% endif %}">
+                    {{message}}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <form method="POST" action="">
         {% csrf_token %}
         {{ form|bootstrap }}

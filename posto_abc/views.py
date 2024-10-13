@@ -7,14 +7,14 @@ from datetime import datetime, timedelta
 from django.db.models import Sum
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, DetailView
-from .models import Abastecimento, Bomba, Tanque, PrecoCombustivel, Posto
+from .models import Abastecimento, Bomba, Tanque, PrecoCombustivel
 from .forms import AbastecimentoForm, PostoForm, PrecoCombustivelForm, BombaForm, TanqueForm
 from .utils import gerar_relatorio
 from django.http import HttpResponse
-
-from django.shortcuts import get_object_or_404
-
-
+from django.views import View
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from .business import PostoAbcBusiness
 
 
 class CriarAbastecimentoView(CreateView):
@@ -39,13 +39,23 @@ class CriarTanqueView(CreateView):
     template_name = 'html/criar_tanque.html'
     success_url = reverse_lazy('criar_tanque')
 
-class CriarPostoView(CreateView):
-
-    model = Posto
-    form_class = PostoForm
+class CriarPostoView(View):
     template_name = 'html/criar_posto.html'
     success_url = reverse_lazy('criar_posto')
 
+    def get(self, request, *args, **kwargs):
+        form = PostoForm()
+        return render(self.request, self.template_name, {'form': form})
+    
+    def post(self, request):
+        form = PostoForm(request.POST)
+        criar_posto = PostoAbcBusiness().criar_posto(request.POST.get('nome', None))
+        if criar_posto:
+            return redirect(self.success_url)
+        else:
+            messages.warning(request, 'Já existe um posto com esse nome.')
+        return render(request, self.template_name, {'form': form})
+            
 
 class CriarPrecoCombustivelView(CreateView):
 
