@@ -12,18 +12,10 @@ from .models import Abastecimento, Bomba, Tanque, PrecoCombustivel
 from .forms import AbastecimentoForm, PostoForm, PrecoCombustivelForm, BombaForm, TanqueForm
 from .utils import gerar_relatorio
 from django.http import HttpResponse
-<<<<<<< HEAD
 from django.views import View
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from .business import PostoAbcBusiness
-=======
-from django.contrib import messages
-
-from django.shortcuts import get_object_or_404, redirect
-
-
->>>>>>> f4c41fec94ae924a8d0e41a08c224efe67500388
 
 
 class CriarAbastecimentoView(CreateView):
@@ -78,7 +70,6 @@ class CriarTanqueView(CreateView):
     template_name = 'html/criar_tanque.html'
     success_url = reverse_lazy('criar_tanque')
 
-<<<<<<< HEAD
 class CriarPostoView(View):
     template_name = 'html/criar_posto.html'
     success_url = reverse_lazy('criar_posto')
@@ -96,24 +87,6 @@ class CriarPostoView(View):
             messages.warning(request, 'Já existe um posto com esse nome.')
         return render(request, self.template_name, {'form': form})
             
-=======
-    def form_valid(self, form):
-        form.save()
-        messages.add_message(self.request, messages.SUCCESS, 'Tanque criado com sucesso.')
-        return super().form_valid(form)
-
-class CriarPostoView(CreateView):
-
-    model = Posto
-    form_class = PostoForm
-    template_name = 'html/criar_posto.html'
-    success_url = reverse_lazy('criar_posto')
-
-    def form_valid(self, form):
-        form.save()
-        messages.add_message(self.request, messages.SUCCESS, 'Posto criado com sucesso.')
-        return super().form_valid(form)
->>>>>>> f4c41fec94ae924a8d0e41a08c224efe67500388
 
 class CriarPrecoCombustivelView(CreateView):
 
