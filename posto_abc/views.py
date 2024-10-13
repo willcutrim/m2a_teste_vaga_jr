@@ -1,5 +1,6 @@
 import io
 from PyPDF2 import PdfWriter, PdfReader
+from django.forms import BaseModelForm
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
@@ -11,10 +12,18 @@ from .models import Abastecimento, Bomba, Tanque, PrecoCombustivel
 from .forms import AbastecimentoForm, PostoForm, PrecoCombustivelForm, BombaForm, TanqueForm
 from .utils import gerar_relatorio
 from django.http import HttpResponse
+<<<<<<< HEAD
 from django.views import View
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from .business import PostoAbcBusiness
+=======
+from django.contrib import messages
+
+from django.shortcuts import get_object_or_404, redirect
+
+
+>>>>>>> f4c41fec94ae924a8d0e41a08c224efe67500388
 
 
 class CriarAbastecimentoView(CreateView):
@@ -24,6 +33,31 @@ class CriarAbastecimentoView(CreateView):
     template_name = 'html/criar_abastecimento.html'
     success_url = reverse_lazy('relatorio_abastecimentos')
 
+    def form_valid(self, form):
+        bomba = form.cleaned_data['bomba']
+        litros = form.cleaned_data['litros']
+        tipo_combustivel = bomba.tanque.tipo_combustivel
+        
+        try:
+            preco_combustivel = PrecoCombustivel.objects.filter(tipo_combustivel=tipo_combustivel).latest('data_atualizacao')
+        except PrecoCombustivel.DoesNotExist:
+            messages.add_message(self.request, messages.ERROR, f'Não há preço cadastrado para o combustível {tipo_combustivel}. Por favor, cadastre o preço primeiro.')
+            form.add_error(None, f'Não há preço cadastrado para o combustível {tipo_combustivel}. Por favor, cadastre o preço primeiro.')
+            return self.form_invalid(form)
+
+        capacidade_tanque = bomba.tanque.capacidade
+        nivel_atual = bomba.tanque.nivel_atual
+        if litros > nivel_atual:
+
+            form.add_error('litros', f'O abastecimento ultrapassa a capacidade máxima do tanque ({capacidade_tanque} litros. Nível atual: {nivel_atual} litros).')
+            return self.render_to_response(self.get_context_data(form=form))
+    
+        tanque = Tanque.objects.filter(id=bomba.tanque.id).first()
+        tanque.nivel_atual -= litros
+        tanque.save()
+        
+        return super().form_valid(form)
+
 
 class CriarBombaView(CreateView):
 
@@ -32,6 +66,11 @@ class CriarBombaView(CreateView):
     template_name = 'html/criar_bomba.html'
     success_url = reverse_lazy('criar_bomba')
 
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Bomba criada com sucesso.')
+        return super().form_valid(form)
+
 class CriarTanqueView(CreateView):
 
     model = Tanque
@@ -39,6 +78,7 @@ class CriarTanqueView(CreateView):
     template_name = 'html/criar_tanque.html'
     success_url = reverse_lazy('criar_tanque')
 
+<<<<<<< HEAD
 class CriarPostoView(View):
     template_name = 'html/criar_posto.html'
     success_url = reverse_lazy('criar_posto')
@@ -56,6 +96,24 @@ class CriarPostoView(View):
             messages.warning(request, 'Já existe um posto com esse nome.')
         return render(request, self.template_name, {'form': form})
             
+=======
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Tanque criado com sucesso.')
+        return super().form_valid(form)
+
+class CriarPostoView(CreateView):
+
+    model = Posto
+    form_class = PostoForm
+    template_name = 'html/criar_posto.html'
+    success_url = reverse_lazy('criar_posto')
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Posto criado com sucesso.')
+        return super().form_valid(form)
+>>>>>>> f4c41fec94ae924a8d0e41a08c224efe67500388
 
 class CriarPrecoCombustivelView(CreateView):
 
@@ -63,6 +121,11 @@ class CriarPrecoCombustivelView(CreateView):
     form_class = PrecoCombustivelForm
     template_name = 'html/criar_preco_combustivel.html'
     success_url = reverse_lazy('criar_preco_combustivel')
+
+    def form_valid(self, form):
+        form.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Preço de combustível criado com sucesso.')
+        return super().form_valid(form)
 
 class RelatorioAbastecimentosView(TemplateView):
 
@@ -72,10 +135,16 @@ class RelatorioAbastecimentosView(TemplateView):
         context = super().get_context_data(**kwargs)
         data_inicio = self.request.GET.get('data_inicio', (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d'))
         data_fim = self.request.GET.get('data_fim', datetime.now().strftime('%Y-%m-%d'))
-        
         relatorio = gerar_relatorio(data_inicio, data_fim)
-        total_valor, total_imposto = self.calcular_totais(relatorio)
-        
+
+        total_valor = 0
+        total_imposto = 0
+
+
+        for relatorio_item in relatorio:
+            total_valor += relatorio_item['total_valor']
+            total_imposto += relatorio_item['total_imposto']
+
         context.update({
             'relatorio': relatorio,
             'total_valor': total_valor,
@@ -84,11 +153,6 @@ class RelatorioAbastecimentosView(TemplateView):
             'data_fim': data_fim,
         })
         return context
-
-    def calcular_totais(self, relatorio):
-        total_valor = relatorio.aggregate(total_valor=Sum('total_valor'))['total_valor']
-        total_imposto = relatorio.aggregate(total_imposto=Sum('total_imposto'))['total_imposto']
-        return total_valor, total_imposto
 
 
 

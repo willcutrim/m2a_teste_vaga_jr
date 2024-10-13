@@ -5,12 +5,20 @@
 {% block content %}
 <div class="container">
     <h1 class="alert alert mt-2 d-flex justify-content-center bg-primary text-light">Criar Abastecimento</h1>
+    {% if messages %}
+        <div class="alert alert-danger mt-2 d-flex justify-content-center">
+        {% for message in messages %}
+        <p class="mb-0">{{ message }} - <a href="{% url 'criar_preco_combustivel' %}">Cadastrar Preço</a></p>
+        {% endfor %}
+        </div>
+    {% endif %}
     <div class="card">
         <div class="card-body">
             <form method="POST" action="">
                 {% csrf_token %}
                 {{ form|bootstrap }}
                 <button type="submit" class="btn btn-primary mt-2">Salvar</button>
+                <a href="{% url 'relatorio_abastecimentos' %}" class="btn btn-light mt-2">Voltar</a>
             </form>
         </div>
     </div>

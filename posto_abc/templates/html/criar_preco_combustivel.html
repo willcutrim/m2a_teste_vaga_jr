@@ -5,10 +5,18 @@
 {% block content %}
 <div class="container">
     <h1 class="alert alert mt-2 d-flex justify-content-center bg-primary text-light">Criar Preço do Combustível</h1>
+    {% if messages %}
+        <div class="alert alert-success mt-2 d-flex justify-content-center">
+        {% for message in messages %}
+        <p class="mb-0">{{ message }}</p>
+        {% endfor %}
+        </div>
+    {% endif %}
     <form method="POST" action="">
         {% csrf_token %}
         {{ form|bootstrap }}
         <button type="submit" class="btn btn-primary mt-2">Salvar</button>
+        <a href="{% url 'relatorio_abastecimentos' %}" class="btn btn-light mt-2">Voltar</a>
     </form>
 </div>
 {% endblock content %}

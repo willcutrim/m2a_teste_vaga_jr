@@ -5,6 +5,7 @@
 {% block content %}
 <div class="container">
     <h1 class="alert alert mt-2 d-flex justify-content-center bg-primary text-light">Criar Posto</h1>
+<<<<<<< HEAD
     {% if messages %}
         <ul>
             {% for message in messages %}
@@ -13,11 +14,21 @@
                 </li>
             {% endfor %}
         </ul>
+=======
+    
+    {% if messages %}
+        <div class="alert alert-success mt-2 d-flex justify-content-center">
+        {% for message in messages %}
+        <p class="mb-0">{{ message }}</p>
+        {% endfor %}
+        </div>
+>>>>>>> f4c41fec94ae924a8d0e41a08c224efe67500388
     {% endif %}
     <form method="POST" action="">
         {% csrf_token %}
         {{ form|bootstrap }}
         <button type="submit" class="btn btn-primary mt-2">Salvar</button>
+        <a href="{% url 'relatorio_abastecimentos' %}" class="btn btn-light mt-2">Voltar</a>
     </form>
 </div>
 {% endblock content %}

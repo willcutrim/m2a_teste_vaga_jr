@@ -1,4 +1,3 @@
-# models.py
 from django.db import models
 
 class Posto(models.Model):
@@ -19,11 +18,11 @@ class Tanque(models.Model):
     nivel_atual = models.FloatField()
     posto = models.ForeignKey(Posto, related_name='tanques', on_delete=models.CASCADE)
 
-    def criar_nivel_atual(self):
-        self.nivel_atual = self.capacidade
-    
     def save(self, *args, **kwargs):
-        self.criar_nivel_atual()
+        if not self.pk:
+
+            self.nivel_atual = self.capacidade
+
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -66,8 +65,7 @@ class Abastecimento(models.Model):
             ).latest('data_atualizacao')
             self.valor = self.litros * preco_combustivel.preco_por_litro
             self.imposto = self.valor * 0.13
-            self.bomba.tanque.nivel_atual -= self.litros
-            self.bomba.tanque.save()
+
         super().save(*args, **kwargs)
 
     def data_formatada(self):

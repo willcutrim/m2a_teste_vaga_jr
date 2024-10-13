@@ -15,7 +15,7 @@ Projeto criado para um teste com intuito de mostrar minhas habilidades em com Py
 Primeiro, clone o repositório para a sua máquina local usando o seguinte comando:
 
 ```bash
-https://github.com/willcutrim/m2a_teste_vaga_jr
+git clone https://github.com/willcutrim/m2a_teste_vaga_jr
 ````
 
 ### 2. Criar e Ativar o Ambiente Virtual
